@@ -23,7 +23,7 @@ class api_connector():
     def get_candles(self, is_live:bool, n:int,token,pair,interval):
         client = CandleClient(token,real=is_live)
 
-        with open('pair_mapping.json', 'r') as f:
+        with open('C:/Users/Angus/Trading-Bot/data/pair_mapping.json', 'r') as f:
             pair_mapping = json.load(f)
         
         if pair not in pair_mapping:
