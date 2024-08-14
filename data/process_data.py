@@ -29,4 +29,4 @@ class processor():
         dfstream['High'] = dfstream['High'].astype(float)
         dfstream['Low'] = dfstream['Low'].astype(float)
 
-        return dfstream
+        return dfstream, candle
