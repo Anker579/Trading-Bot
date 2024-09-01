@@ -16,8 +16,8 @@ class authoriser():
         else:
             raise ValueError(f"Cannot convert {s} to boolean, please input a formattable string")
 
-    def auth_deets(self, is_live, type_:str,):
-        global has_prompted
+    def auth_deets(self, is_live, type_:str, has_prompted):
+        
         if not has_prompted:
             is_live = self.str_to_bool(s=input("Would you like to run on your LIVE account? if n then will be DEMO (y/n)"))
             has_prompted = True

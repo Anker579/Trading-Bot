@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 import ta
 
 
@@ -6,6 +7,16 @@ import ta
 class processor():
     def __init__(self) -> None:
         pass
+    
+    def check_pair(self, pair):
+        with open('C:/Users/Angus/Trading-Bot/data/pair_mapping.json', 'r') as f:
+            pair_mapping = json.load(f)
+        
+        if pair not in pair_mapping:
+            raise ValueError(f"Invalid pair: {pair}. Valid pairs are: {', '.join(pair_mapping.keys())}")
+        
+        pair_const = pair_mapping[pair]
+        return pair_const
 
     def add_sma(self, df, sma_windows:list):
         #adds a column to input dataframe that is the running simple moving average for a given window

@@ -22,16 +22,16 @@ class trade():
                   }
         return values
  
-    def buy_sell(self, signal, client, accID, p_l_values):
+    def buy_sell(self, signal, client, accID, p_l_values, pair):
         #BUY
         if signal == 1:
-            mo = MarketOrderRequest(instrument="EUR_USD", units=-1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPS"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLS"]).data)
+            mo = MarketOrderRequest(instrument=pair, units=-1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPS"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLS"]).data)
             r = orders.OrderCreate(accountID = accID, data=mo.data)
             rv = client.request(r)
             print(rv)
         #SELL
         elif signal == 2:
-            mo = MarketOrderRequest(instrument="EUR_USD", units=1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPB"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLB"]).data)
+            mo = MarketOrderRequest(instrument=pair, units=1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPB"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLB"]).data)
             r = orders.OrderCreate(accountID = accID, data=mo.data)
             rv = client.request(r)
             print(rv)
