@@ -2,7 +2,6 @@ from dotenv import load_dotenv, dotenv_values
 import os
 
 is_live = False
-has_prompted = False
 
 class authoriser():
     def __init__(self) -> None:
@@ -19,7 +18,8 @@ class authoriser():
     def auth_deets(self, is_live, type_:str, has_prompted):
         
         if not has_prompted:
-            is_live = self.str_to_bool(s=input("Would you like to run on your LIVE account? if n then will be DEMO (y/n)"))
+            #is_live = self.str_to_bool(s=input("Would you like to run on your LIVE account? if n then will be DEMO (y/n)"))
+            is_live = False
             has_prompted = True
         if is_live:
             if type_ == "token":

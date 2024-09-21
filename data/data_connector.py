@@ -1,5 +1,6 @@
 import datetime as dt
 import yfinance as yf
+import json
 from oanda_candles import Pair, Gran, CandleClient
 
 # IMPORTANT changed DNS settings can effect this (will stop it working)
@@ -22,7 +23,13 @@ class api_connector():
     def get_candles(self, is_live:bool, n:int,token,pair,interval):
         client = CandleClient(token,real=is_live)
 
-        pair_const = pair
+        with open('./data/pair_mapping.json', 'r') as f:
+            pair_mapping = json.load(f)
+
+        if pair not in pair_mapping:
+            raise ValueError(f"Invalid pair: {pair}. Valid pairs are: {', '.join(pair_mapping.keys())}")
+
+        pair_const = pair_mapping[pair]
 
         collector = client.get_collector(pair_const,Gran.M15)
 
