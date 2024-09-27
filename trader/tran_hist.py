@@ -7,7 +7,6 @@ import pandas as pd
 is_live = False
 has_prompted = True
 
-
 def get_history(accID, access_token):
     today = datetime.now(timezone.utc)
     formatted_date = today.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -30,12 +29,11 @@ def get_history(accID, access_token):
 
     response = requests.get(url, headers=headers, params=params)
 
-    fieldnames = ['id', 'time', 'type', 'instrument', 'units', 'price', 'pl', 'accountBalance']
-
     all_transactions = []
 
     # While loop to iterate through multiple pages
     while url:
+
         # Make the API request
         response = requests.get(url, headers=headers, params=params)
 
@@ -54,6 +52,9 @@ def get_history(accID, access_token):
         else:
             print(f"Error: {response.status_code} - {response.text}")
             break
+    
+    #print(response)
+    #print(all_transactions)
         
     if all_transactions:
         df = pd.DataFrame(all_transactions)
