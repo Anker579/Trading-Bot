@@ -4,3 +4,4 @@ oandapyV20==0.6.3
 pandas==2.0.0
 time-int==0.0.9
 numpy==1.26.4
+ta==0.11.0
