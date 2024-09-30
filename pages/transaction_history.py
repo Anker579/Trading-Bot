@@ -1,5 +1,6 @@
 import streamlit as st
 from trader import tran_hist, auth
+from main import make_trade
 
 is_live = False
 has_prompted = True
@@ -39,3 +40,6 @@ if show_data:
     hist_data
 
 st.line_chart(data=hist_data, x="Time", y="Cumuluative_profit")
+
+if st.button("Click Here to Make a Trade on the EUR/USD Pair that uses the SMA Algorithm"):
+    make_trade()
