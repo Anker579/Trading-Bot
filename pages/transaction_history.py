@@ -1,5 +1,5 @@
 import streamlit as st
-from trader import tran_hist, #auth
+from trader import tran_hist
 from main import make_trade
 
 is_live = False
