@@ -1,6 +1,6 @@
 from data import data_connector, process_data, signal_generators
 #from apscheduler.schedulers.blocking import BlockingScheduler
-from trader import auth, buy_sell
+#from trader import auth, buy_sell
 from oandapyV20 import API
 
 def make_trade():
@@ -8,14 +8,18 @@ def make_trade():
     has_prompted = True
 
     my_trader = buy_sell.trade()
-    my_auth = auth.authoriser()
+    #my_auth = auth.authoriser()
+    access_token='eac0b37f2067f37b1bb9884dfb473e6b-e204948541e0c8a2ba8a967492225ca7'
+    accID = '101-004-29576199-001'
     my_connector = data_connector.api_connector()
     my_processor = process_data.processor()
     my_sig_gens = signal_generators.sig_gens()
 
     pair = my_processor.check_pair("EUR_USD")
 
-    my_candles = my_connector.get_candles(is_live, n=201, token=my_auth.auth_deets(is_live, "token", has_prompted), pair=pair, interval=1)
+    #my_candles = my_connector.get_candles(is_live, n=201, token=my_auth.auth_deets(is_live, "token", has_prompted), pair=pair, interval=1)
+    my_candles = my_connector.get_candles(is_live, n=201, token=access_token, pair=pair, interval=1)
+
 
     #receives a tuple since the profit/loss calculator needs a candle - uses the one that format columns iterates over last
     format_tuple = my_processor.format_columns(my_candles)
@@ -33,8 +37,8 @@ def make_trade():
 
     # EXECUTING ORDERS
 
-    accID = my_auth.auth_deets(is_live, "id", has_prompted)
-    access_token = my_auth.auth_deets(is_live, "token", has_prompted)
+    #accID = my_auth.auth_deets(is_live, "id", has_prompted)
+    #access_token = my_auth.auth_deets(is_live, "token", has_prompted)
     client = API(access_token)
 
     #-----------------------------------------------------------------
