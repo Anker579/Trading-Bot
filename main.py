@@ -1,6 +1,6 @@
 from data import data_connector, process_data, signal_generators
 #from apscheduler.schedulers.blocking import BlockingScheduler
-#from trader import auth, buy_sell
+from trader import buy_sell
 from oandapyV20 import API
 
 def make_trade():
