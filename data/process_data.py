@@ -9,7 +9,7 @@ class processor():
         pass
     
     def check_pair(self, pair):
-        with open('C:/Users/Angus/Trading-Bot/data/pair_mapping.json', 'r') as f:
+        with open('./data/pair_mapping.json', 'r') as f:
             pair_mapping = json.load(f)
         
         if pair not in pair_mapping:
