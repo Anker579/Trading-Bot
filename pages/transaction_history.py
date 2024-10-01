@@ -42,5 +42,5 @@ if show_data:
 
 st.line_chart(data=hist_data, x="Time", y="Cumuluative_profit")
 
-if st.button("Click Here to Make a Trade on the EUR/USD Pair that uses the SMA Algorithm"):
+if st.button("Click Here to Run the Trading Code (the app may not identify a buy/sell signal so nothing may happen)"):
     make_trade()

@@ -29,3 +29,8 @@ col1.image(image="Bearish.jpg", caption="BEARISH PATTERN (SELL SIGNAL)")
 col2.image(image="Bullish.jpg", caption="BULLISH PATTERN (BUY SIGNAL)")
 st.write("This algorithm therefore often returns a 0 or 'no action' signal, which is helpful to not always have a return and look for a specific behaviour, however, the behaviour this algorithm looks for can as easily occur due to approximately random fluctuations in a pairs value and therefore can make poor trades")
 st.write("Algorithm Credit: [Code Training Youtube](%s)" % "https://www.youtube.com/watch?v=WcfKaZL4vpA&t=997s")
+
+st.header("Oanda Trading Platform")
+
+st.write("Oanda is an online trading platform that allows you to trade on the foreign exchange, importantly it allows you to use a demo account with some dummy capital to trade with and see the results.")
+st.write("Oanda also has api functions meaning that my app is able to communicate directly with oanda, to make trades or to retrieve transaction history, without the need of something more external such as a database.")
