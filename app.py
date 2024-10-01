@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from data import data_connector, process_data, signal_generators
-from trader import auth, tran_hist
+#from trader import auth, tran_hist
 from tests.profit_loss import calc_p_l
 
 st.set_page_config(
