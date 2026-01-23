@@ -22,7 +22,7 @@ def get_history(accID, access_token):
     url = f'{BASE_URL}/accounts/{accID}/transactions'
 
     params = {
-        'from': '2024-07-29T00:00:00Z',  # Replace with your desired start date
+        'from': '2025-07-29T00:00:00Z',  # Replace with your desired start date
         'to': formatted_date,     # Replace with your desired end date 
         'pageSize': 1000
         }
