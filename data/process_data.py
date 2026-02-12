@@ -20,6 +20,7 @@ class processor():
 
     def add_sma(self, df, sma_windows:list):
         #adds a column to input dataframe that is the running simple moving average for a given window
+        print(df["Close"])
         for sma_window in sma_windows:
             df[f"sma_{sma_window}"] = ta.trend.SMAIndicator(close=df["Close"], window=sma_window).sma_indicator()
         return df
