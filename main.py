@@ -54,11 +54,11 @@ def make_trade():
     #scheduler.add_job(my_trader.buy_sell(signal, client, accID, p_l_values), 'cron', day_of_week='mon-fri', hour='00-23', minute='1,16,31,46', start_date='2022-01-12 12:00:00', timezone='America/Chicago')
     #scheduler.start()
 
-    if __name__ == "__main__":
-        try:
-            make_trade()
-        except Exception as e:
-            import traceback
-            print("ERROR:", e)
-            traceback.print_exc()
-            raise
+if __name__ == "__main__":
+    try:
+        make_trade()
+    except Exception as e:
+        import traceback
+        print("ERROR:", e)
+        traceback.print_exc()
+        raise
