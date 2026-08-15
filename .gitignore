@@ -1,1 +1,9 @@
 .env
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Bot runtime logs
+bot.log
+*.log

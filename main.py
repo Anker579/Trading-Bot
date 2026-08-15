@@ -1,5 +1,3 @@
-from signal import signal
-
 from data import data_connector, process_data, signal_generators
 from trader import buy_sell
 from oandapyV20 import API
