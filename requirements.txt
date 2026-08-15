@@ -5,3 +5,4 @@ pandas>=2.1,<2.3
 time-int==0.0.9
 ta==0.11.0
 numpy==1.26.4
+python-dotenv==1.0.0

@@ -1,4 +1,4 @@
-
+import pandas as pd
 
 
 class sig_gens():
@@ -29,16 +29,34 @@ class sig_gens():
             return 0
 
     def sma_sig_gen(self, df):
-        #Gets passed the most recent row of the df and does simple calculations on the sma values
-        df = df.iloc[-1]
-        sma_50 = df.sma_50
-        sma_200 = df.sma_200
-        if sma_50 > sma_200:
+        # Calculates if the SMA50 and SMA200 have crossed over in the last two rows of the dataframe
+        previous = df.iloc[-2]
+        current = df.iloc[-1]
+
+        values = [
+            previous.sma_50,
+            previous.sma_200,
+            current.sma_50,
+            current.sma_200
+        ]
+
+        if any(pd.isna(value) for value in values):
+            return 0
+
+        # Bullish crossover: SMA50 moves from below SMA200 to above it
+        if (
+            previous.sma_50 <= previous.sma_200
+            and current.sma_50 > current.sma_200
+        ):
             return 2
-        #bullish
-        elif sma_50 < sma_200:
+
+        # Bearish crossover: SMA50 moves from above SMA200 to below it
+        elif (
+            previous.sma_50 >= previous.sma_200
+            and current.sma_50 < current.sma_200
+        ):
             return 1
-        #none
+
+        # No crossover
         else:
             return 0
-        
