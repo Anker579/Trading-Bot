@@ -1,5 +1,3 @@
-from signal import signal
-
 from data import data_connector, process_data, signal_generators
 from trader import buy_sell
 from oandapyV20 import API
@@ -78,7 +76,10 @@ def make_trade():
 
     #accID = my_auth.auth_deets(is_live, "id", has_prompted)
     #access_token = my_auth.auth_deets(is_live, "token", has_prompted)
-    client = API(access_token)
+    client = API(
+        access_token=access_token,
+        environment="practice"
+    )
 
     #-----------------------------------------------------------------
     # all this defines stop loss and stop profit     
