@@ -7,3 +7,4 @@ __pycache__/
 # Bot runtime logs
 bot.log
 *.log
+.last_trade_candle

@@ -1,10 +1,15 @@
+from signal import signal
+
 from data import data_connector, process_data, signal_generators
 from trader import buy_sell
 from oandapyV20 import API
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+LAST_TRADE_FILE = os.path.join(BASE_DIR, ".last_trade_candle")
 
 def make_trade():
     is_live = False
@@ -44,6 +49,21 @@ def make_trade():
 
     signal = my_sig_gens.sma_sig_gen(completed_df)
 
+    # Identify the completed M15 candle that generated this signal
+    candle_id = str(int(completed_df["Time"].iloc[-1]))
+    
+    last_trade_candle = None
+    # Adds execution signal logic to prevent duplicate trades for the same candle
+    if os.path.exists(LAST_TRADE_FILE):
+        with open(LAST_TRADE_FILE, "r") as f:
+            last_trade_candle = f.read().strip()
+    
+    if signal != 0 and candle_id == last_trade_candle:
+        print(f"Signal already processed for candle {candle_id}")
+        execution_signal = 0
+    else:
+        execution_signal = signal
+
     #Temp Debug Code
     print("\n--- SIGNAL DEBUG ---")
     print(completed_df[["Close", "sma_50", "sma_200"]].tail(3))
@@ -64,7 +84,7 @@ def make_trade():
     print(p_l_values)
 
     #my_trader.buy_sell(signal, client, accID, p_l_values, pair)
-    print(f"DRY RUN - would execute signal: {signal}")
+    print(f"DRY RUN - would execute signal: {execution_signal}")
 
     #scheduler = BlockingScheduler()
     #scheduler.add_job(my_trader.buy_sell(signal, client, accID, p_l_values), 'cron', day_of_week='mon-fri', hour='00-23', minute='1,16,31,46', start_date='2022-01-12 12:00:00', timezone='America/Chicago')

@@ -20,22 +20,24 @@ class processor():
 
     def add_sma(self, df, sma_windows:list):
         #adds a column to input dataframe that is the running simple moving average for a given window
-        print(df["Close"])
+        #print(df["Close"])
         for sma_window in sma_windows:
             df[f"sma_{sma_window}"] = ta.trend.SMAIndicator(close=df["Close"], window=sma_window).sma_indicator()
         return df
     
     def format_columns(self, candle_db):
-        dfstream = pd.DataFrame(columns=['Open','Close','High','Low'])
+        dfstream = pd.DataFrame(columns=['Time','Open','Close','High','Low'])
         candles = candle_db
         i=0
         for candle in candles:
+            dfstream.loc[i, ['Time']] = int(candle.time)
             dfstream.loc[i, ['Open']] = float(str(candle.bid.o))
             dfstream.loc[i, ['Close']] = float(str(candle.bid.c))
             dfstream.loc[i, ['High']] = float(str(candle.bid.h))
             dfstream.loc[i, ['Low']] = float(str(candle.bid.l))
             i=i+1
 
+        dfstream['Time'] = dfstream['Time'].astype('int64')
         dfstream['Open'] = dfstream['Open'].astype(float)
         dfstream['Close'] = dfstream['Close'].astype(float)
         dfstream['High'] = dfstream['High'].astype(float)
