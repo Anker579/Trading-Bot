@@ -8,3 +8,4 @@ __pycache__/
 bot.log
 *.log
 .last_trade_candle
+DRY_RUN=true

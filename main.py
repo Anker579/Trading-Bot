@@ -10,6 +10,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 LAST_TRADE_FILE = os.path.join(BASE_DIR, ".last_trade_candle")
+DRY_RUN = os.getenv("DRY_RUN", "true").lower() == "true"
 
 def make_trade():
     is_live = False
@@ -64,10 +65,13 @@ def make_trade():
     else:
         execution_signal = signal
 
-    #Temp Debug Code
+    # Temp Debug Code
     print("\n--- SIGNAL DEBUG ---")
     print(completed_df[["Close", "sma_50", "sma_200"]].tail(3))
     print(f"Signal: {signal}")
+    print(f"Execution signal: {execution_signal}")
+    print(f"Candle ID: {candle_id}")
+    print(f"Dry run: {DRY_RUN}")
     print("--------------------\n")
 
     # EXECUTING ORDERS
@@ -83,8 +87,26 @@ def make_trade():
     #print(dfstream.iloc[:-1,:])
     print(p_l_values)
 
-    #my_trader.buy_sell(signal, client, accID, p_l_values, pair)
-    print(f"DRY RUN - would execute signal: {execution_signal}")
+    if execution_signal == 0:
+        print("No trade to execute")
+
+    elif DRY_RUN:
+        print(f"DRY RUN - would execute signal: {execution_signal}")
+
+    else:
+        my_trader.buy_sell(
+            execution_signal,
+            client,
+            accID,
+            p_l_values,
+            pair
+        )
+
+        # Only mark the candle as processed after the OANDA order succeeds
+        with open(LAST_TRADE_FILE, "w") as f:
+            f.write(candle_id)
+
+        print(f"Recorded traded candle: {candle_id}")
 
     #scheduler = BlockingScheduler()
     #scheduler.add_job(my_trader.buy_sell(signal, client, accID, p_l_values), 'cron', day_of_week='mon-fri', hour='00-23', minute='1,16,31,46', start_date='2022-01-12 12:00:00', timezone='America/Chicago')
