@@ -18,7 +18,13 @@ class api_connector():
 
         formatted_date = f"{date_60_days_ago.strftime('%Y')}-{date_60_days_ago.strftime('%m')}-{date_60_days_ago.strftime('%d')}"
 
-        dataF = yf.download("EURUSD=X", start=formatted_date, end=nowdate, interval='15m')
+        dataF = yf.download(
+            "EURUSD=X",
+            start=formatted_date,
+            end=nowdate,
+            interval='15m',
+            multi_level_index=False
+        )        
         return dataF
 
 

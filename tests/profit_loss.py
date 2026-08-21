@@ -4,7 +4,7 @@ def calc_p_l(df):
     sell_price = 0
     buy_price = 0
     index = 0
-    prev_sig = 1
+    prev_sig = 0
     unique_sigs = 1
     profit_stream = {
         "time": [],
