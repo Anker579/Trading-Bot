@@ -12,7 +12,7 @@ DRY_RUN = os.getenv("DRY_RUN", "true").lower() == "true"
 
 def make_trade():
     is_live = False
-    has_prompted = True
+    #has_prompted = True
 
     my_trader = buy_sell.trade()
 
@@ -63,7 +63,7 @@ def make_trade():
     else:
         execution_signal = signal
 
-    # Temp Debug Code
+    # Debug Code
     print("\n--- SIGNAL DEBUG ---")
     print(completed_df[["Close", "sma_50", "sma_200"]].tail(3))
     print(f"Signal: {signal}")
@@ -71,7 +71,7 @@ def make_trade():
     print(f"Candle ID: {candle_id}")
     print(f"Dry run: {DRY_RUN}")
     print("--------------------\n")
-
+    
     # EXECUTING ORDERS
 
     #accID = my_auth.auth_deets(is_live, "id", has_prompted)
@@ -84,9 +84,6 @@ def make_trade():
     #-----------------------------------------------------------------
     # all this defines stop loss and stop profit     
     p_l_values = my_trader.p_l_stops(dfstream, 2., candle=candle)
-
-    #print(dfstream.iloc[:-1,:])
-    print(p_l_values)
 
     if execution_signal == 0:
         print("No trade to execute")
@@ -107,11 +104,8 @@ def make_trade():
         with open(LAST_TRADE_FILE, "w") as f:
             f.write(candle_id)
 
+        print(f"------ TRADE MADE - code: {execution_signal} --------")
         print(f"Recorded traded candle: {candle_id}")
-
-    #scheduler = BlockingScheduler()
-    #scheduler.add_job(my_trader.buy_sell(signal, client, accID, p_l_values), 'cron', day_of_week='mon-fri', hour='00-23', minute='1,16,31,46', start_date='2022-01-12 12:00:00', timezone='America/Chicago')
-    #scheduler.start()
 
 if __name__ == "__main__":
     try:
