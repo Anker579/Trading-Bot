@@ -8,3 +8,4 @@ __pycache__/
 bot.log
 *.log
 .last_trade_candle
+run_bot.sh

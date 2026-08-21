@@ -28,14 +28,15 @@ class trade():
             print("SELL signal")
             mo = MarketOrderRequest(
                 instrument=pair,
-                units=1000,
+                units=-1000,
                 takeProfitOnFill=TakeProfitDetails(
                     price=f'{p_l_values["TPB"]:.5f}'
                 ).data,
                 stopLossOnFill=StopLossDetails(
                     price=f'{p_l_values["SLB"]:.5f}'
                 ).data
-            )            r = orders.OrderCreate(accountID = accID, data=mo.data)
+            )           
+            r = orders.OrderCreate(accountID = accID, data=mo.data)
             rv = client.request(r)
             print(rv)
         #SELL
@@ -43,7 +44,7 @@ class trade():
             print("BUY signal")
             mo = MarketOrderRequest(
                 instrument=pair,
-                units=-1000,
+                units=1000,
                 takeProfitOnFill=TakeProfitDetails(
                     price=f'{p_l_values["TPS"]:.5f}'
                 ).data,
