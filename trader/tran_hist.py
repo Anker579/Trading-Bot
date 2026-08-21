@@ -1,7 +1,7 @@
 import requests
 import csv
 #import auth
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import pandas as pd
 
 is_live = False
@@ -10,6 +10,8 @@ has_prompted = True
 def get_history(accID, access_token):
     today = datetime.now(timezone.utc)
     formatted_date = today.strftime('%Y-%m-%dT%H:%M:%SZ')
+    start_date = today - timedelta(days=364)
+    formatted_start_date = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
     BASE_URL = 'https://api-fxpractice.oanda.com/v3'  # Use api-fxtrade for live accounts
 
     # Define the specific currency pair you are interested in
@@ -22,7 +24,7 @@ def get_history(accID, access_token):
     url = f'{BASE_URL}/accounts/{accID}/transactions'
 
     params = {
-        'from': '2025-07-29T00:00:00Z',  # Replace with your desired start date
+        'from': formatted_start_date,  # Replace with your desired start date
         'to': formatted_date,     # Replace with your desired end date 
         'pageSize': 1000
         }
