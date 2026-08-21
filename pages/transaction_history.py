@@ -1,6 +1,11 @@
 import streamlit as st
 from trader import tran_hist
 from main import make_trade
+from dotenv import load_dotenv
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 is_live = False
 has_prompted = True
@@ -8,8 +13,9 @@ has_prompted = True
 #my_auth = auth.authoriser()
 #accID = my_auth.auth_deets(is_live, "id", has_prompted)
 #access_token = my_auth.auth_deets(is_live, "token", has_prompted)
-access_token='eac0b37f2067f37b1bb9884dfb473e6b-e204948541e0c8a2ba8a967492225ca7'
-accID = '101-004-29576199-001'
+
+access_token = os.getenv("OANDA_ACCESS_TOKEN")
+accID = os.getenv("OANDA_ACCOUNT_ID")
 
 response_df = tran_hist.get_history(accID=accID, access_token=access_token)
 

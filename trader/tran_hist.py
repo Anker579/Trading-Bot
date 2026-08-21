@@ -50,16 +50,15 @@ def get_history(accID, access_token):
             url = pages[0] if pages else None  # Get the next page URL
             params = None  # No need to pass params for the next page requests
         else:
-            print(f"Error: {response.status_code} - {response.text}")
-            break
+            raise RuntimeError(
+                f"OANDA API error {response.status_code}: {response.text}"
+            )
     
     #print(response)
     #print(all_transactions)
-        
-    if all_transactions:
-        df = pd.DataFrame(all_transactions)
     
-    return df
+    
+    return pd.DataFrame(all_transactions)
 
 
     
