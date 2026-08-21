@@ -26,14 +26,31 @@ class trade():
         #BUY
         if signal == 1:
             print("SELL signal")
-            mo = MarketOrderRequest(instrument=pair, units=-1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPS"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLS"]).data)
-            r = orders.OrderCreate(accountID = accID, data=mo.data)
+            mo = MarketOrderRequest(
+                instrument=pair,
+                units=1000,
+                takeProfitOnFill=TakeProfitDetails(
+                    price=f'{p_l_values["TPB"]:.5f}'
+                ).data,
+                stopLossOnFill=StopLossDetails(
+                    price=f'{p_l_values["SLB"]:.5f}'
+                ).data
+            )            r = orders.OrderCreate(accountID = accID, data=mo.data)
             rv = client.request(r)
             print(rv)
         #SELL
         elif signal == 2:
             print("BUY signal")
-            mo = MarketOrderRequest(instrument=pair, units=1000, takeProfitOnFill=TakeProfitDetails(price=p_l_values["TPB"]).data, stopLossOnFill=StopLossDetails(price=p_l_values["SLB"]).data)
+            mo = MarketOrderRequest(
+                instrument=pair,
+                units=-1000,
+                takeProfitOnFill=TakeProfitDetails(
+                    price=f'{p_l_values["TPS"]:.5f}'
+                ).data,
+                stopLossOnFill=StopLossDetails(
+                    price=f'{p_l_values["SLS"]:.5f}'
+                ).data
+            )
             r = orders.OrderCreate(accountID = accID, data=mo.data)
             rv = client.request(r)
             print(rv)
