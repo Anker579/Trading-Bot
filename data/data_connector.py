@@ -23,8 +23,8 @@ class api_connector():
             start=formatted_date,
             end=nowdate,
             interval='15m',
-            multi_level_index=False
-        )        
+        )
+        dataF.columns = dataF.columns.get_level_values(0)         
         return dataF
 
 
