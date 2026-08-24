@@ -92,7 +92,7 @@ def make_trade():
         print(f"DRY RUN - would execute signal: {execution_signal}")
 
     else:
-        my_trader.buy_sell(
+        trade_made = my_trader.buy_sell(
             execution_signal,
             client,
             accID,
@@ -100,12 +100,13 @@ def make_trade():
             pair
         )
 
-        # Only mark the candle as processed after the OANDA order succeeds
-        with open(LAST_TRADE_FILE, "w") as f:
-            f.write(candle_id)
-
-        print(f"------ TRADE MADE - code: {execution_signal} --------")
-        print(f"Recorded traded candle: {candle_id}")
+        # Only mark the candle as processed after the OANDA order succeeds and has traded
+        if trade_made:
+            with open(LAST_TRADE_FILE, "w") as f:
+                f.write(candle_id)
+    
+            print(f"------ TRADE MADE - code: {execution_signal} --------")
+            print(f"Recorded traded candle: {candle_id}")
 
 if __name__ == "__main__":
     try:
