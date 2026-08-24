@@ -1,6 +1,7 @@
 import datetime as dt
 import yfinance as yf
 import json
+import time
 from oandapyV20 import API
 import oandapyV20.endpoints.instruments as instruments
 from types import SimpleNamespace
@@ -55,8 +56,20 @@ class api_connector():
             instrument=pair_const,
             params=params
         )
-    
-        response = client.request(request)
+
+        # make 3 attempts at request before stopping.
+        for attempt in range(3):
+            try:
+                response = client.request(request)
+                break
+            except Exception as e:
+                if attempt < 2:
+                    print(f"OANDA candle request failed - retrying ({attempt + 1}/2)")
+                    time.sleep(5)
+                else:
+                    raise RuntimeError(
+                        "OANDA candle request failed after 3 attempts"
+                    ) from None
     
         candles = []
     
