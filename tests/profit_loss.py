@@ -2,6 +2,14 @@ import pandas as pd
 import config
 
 def calc_p_l(df):
+
+    if "Datetime" in df.columns:
+        time_column = "Datetime"
+    elif "Date" in df.columns:
+        time_column = "Date"
+    else:
+        raise ValueError("Data must contain a Date or Datetime column")
+
     sell_price = 0
     buy_price = 0
     index = 0
@@ -30,7 +38,7 @@ def calc_p_l(df):
                 #print(df["Datetime"][index])
                 
                 profit = config.TRADE_UNITS*(sell_price-buy_price)
-                profit_stream["time"].append(df["Datetime"][index])
+                profit_stream["time"].append(df[time_column][index])
                 profit_stream["profit"].append(profit)
             unique_sigs += 1
             #print(f"{sig}___{profit}")

@@ -1,6 +1,6 @@
 import streamlit as st
 from data import data_connector
-from backtest import run_sma_backtest
+from tests.backtest import run_sma_backtest
 import config
 
 my_connector = data_connector.api_connector()
@@ -9,7 +9,11 @@ period = config.BACKTEST_PERIOD
 
 sma_windows = config.SMA_WINDOWS
 
-back_data = my_connector.yf_get(period=config.BACKTEST_PERIOD)
+back_data = my_connector.yf_get(
+    period=config.BACKTEST_PERIOD,
+    ticker=config.YF_TICKER,
+    interval=config.YF_INTERVAL
+    )
 
 formatted_data, backtest_profit = run_sma_backtest(
     back_data,

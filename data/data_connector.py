@@ -5,14 +5,13 @@ import time
 from oandapyV20 import API
 import oandapyV20.endpoints.instruments as instruments
 from types import SimpleNamespace
-import config
 
-# IMPORTANT changed DNS settings can effect this (will stop it working)
+# IMPORTANT, changed DNS settings can effect this (will stop it working)
 class api_connector():
     def __init__(self) -> None:
         self.period = 60
     
-    def yf_get(self, period:int):
+    def yf_get(self, period: int, ticker: str, interval: str):
         x = dt.datetime.now()
         nowdate = f'{x.strftime("%Y")}-{x.strftime("%m")}-{x.strftime("%d")}'
 
@@ -21,10 +20,10 @@ class api_connector():
         formatted_date = f"{date_60_days_ago.strftime('%Y')}-{date_60_days_ago.strftime('%m')}-{date_60_days_ago.strftime('%d')}"
 
         dataF = yf.download(
-            config.YF_TICKER,
+            ticker,
             start=formatted_date,
             end=nowdate,
-            interval=config.YF_INTERVAL,
+            interval=interval,
         )
         dataF.columns = dataF.columns.get_level_values(0)         
         return dataF
