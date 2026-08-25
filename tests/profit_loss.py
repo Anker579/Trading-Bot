@@ -1,4 +1,5 @@
 import pandas as pd
+import config
 
 def calc_p_l(df):
     sell_price = 0
@@ -28,7 +29,7 @@ def calc_p_l(df):
                 #print(index)
                 #print(df["Datetime"][index])
                 
-                profit = 1000*(sell_price-buy_price)
+                profit = config.TRADE_UNITS*(sell_price-buy_price)
                 profit_stream["time"].append(df["Datetime"][index])
                 profit_stream["profit"].append(profit)
             unique_sigs += 1

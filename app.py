@@ -3,6 +3,7 @@ import pandas as pd
 from data import data_connector, process_data, signal_generators
 #from trader import auth, tran_hist
 from tests.profit_loss import calc_p_l
+import config
 
 st.set_page_config(
     page_title="Simple Algo Trader",
@@ -18,7 +19,7 @@ st.header("Algorithms")
 
 st.subheader("Simple Moving Average")
 
-st.write("This very common algorithm works by calculating two simple moving averages for the data, right now the given two are a 50 and 100 data point moving average, then, if the former has moved above the latter it will return a buy signal, and vice versa for moving below.")
+st.write(f"This very common algorithm works by calculating two simple moving averages for the data, right now the given two are a {config.SMA_WINDOWS[0]} and {config.SMA_WINDOWS[1]} data point moving average, then, if the former has moved above the latter it will return a buy signal, and vice versa for moving below.")
 st.write("This means that this algorithm will only output a buy or sell signal, never a '0' or 'don't buy' signal, as such the model only makes a purchase each time the data pattern changes to a buy signal, not everytime there is a buy signal, to prevent over-buying. This does however mean it takes less advantage of large upswings in a pairs performance, but ofcourse means less risk.")
 
 st.subheader("Recent Open Comparator")

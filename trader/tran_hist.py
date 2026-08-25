@@ -3,6 +3,7 @@ import csv
 #import auth
 from datetime import datetime, timezone, timedelta
 import pandas as pd
+import config
 
 is_live = False
 has_prompted = True
@@ -12,10 +13,12 @@ def get_history(accID, access_token):
     formatted_date = today.strftime('%Y-%m-%dT%H:%M:%SZ')
     start_date = today - timedelta(days=364)
     formatted_start_date = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
-    BASE_URL = 'https://api-fxpractice.oanda.com/v3'  # Use api-fxtrade for live accounts
 
-    # Define the specific currency pair you are interested in
-    CURRENCY_PAIR = 'EUR_USD'
+    #Set the base url based on config for live or practice endpoint
+    if config.OANDA_ENVIRONMENT == "live":
+        BASE_URL = "https://api-fxtrade.oanda.com/v3"
+    else:
+        BASE_URL = "https://api-fxpractice.oanda.com/v3"
 
     headers = {
         'Authorization': f'Bearer {access_token}'

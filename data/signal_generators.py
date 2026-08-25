@@ -28,16 +28,19 @@ class sig_gens():
         else:
             return 0
 
-    def sma_sig_gen(self, df):
-        # Calculates if the SMA50 and SMA200 have crossed over in the last two rows of the dataframe
+    def sma_sig_gen(self, df, sma_windows):
+        # Calculates if the two entered SMA windows (from config) have crossed over in the last two rows of the dataframe
+        fast_sma = f"sma_{sma_windows[0]}"
+        slow_sma = f"sma_{sma_windows[1]}"
+        
         previous = df.iloc[-2]
         current = df.iloc[-1]
 
         values = [
-            previous.sma_50,
-            previous.sma_200,
-            current.sma_50,
-            current.sma_200
+            previous[fast_sma],
+            previous[slow_sma],
+            current[fast_sma],
+            current[slow_sma],
         ]
 
         if any(pd.isna(value) for value in values):
@@ -45,15 +48,15 @@ class sig_gens():
 
         # Bullish crossover: SMA50 moves from below SMA200 to above it
         if (
-            previous.sma_50 <= previous.sma_200
-            and current.sma_50 > current.sma_200
+            previous[fast_sma] <= previous[slow_sma]
+            and current[fast_sma] > current[slow_sma]
         ):
             return 2
 
         # Bearish crossover: SMA50 moves from above SMA200 to below it
         elif (
-            previous.sma_50 >= previous.sma_200
-            and current.sma_50 < current.sma_200
+            previous[fast_sma] >= previous[slow_sma]
+            and current[fast_sma] < current[slow_sma]
         ):
             return 1
 

@@ -2,6 +2,7 @@ from oandapyV20.contrib.requests import TakeProfitDetails, StopLossDetails
 from oandapyV20.contrib.requests import MarketOrderRequest
 import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.positions as positions
+import config
 
 class trade():
     def __init__(self) -> None:
@@ -53,7 +54,7 @@ class trade():
 
             mo = MarketOrderRequest(
                 instrument=pair,
-                units=-1000,
+                units= (-1 * config.TRADE_UNITS),
                 takeProfitOnFill=TakeProfitDetails(
                     price=f'{p_l_values["TPS"]:.5f}'
                 ).data,
@@ -84,7 +85,7 @@ class trade():
 
             mo = MarketOrderRequest(
                 instrument=pair,
-                units=1000,
+                units=config.TRADE_UNITS,
                 takeProfitOnFill=TakeProfitDetails(
                     price=f'{p_l_values["TPB"]:.5f}'
                 ).data,

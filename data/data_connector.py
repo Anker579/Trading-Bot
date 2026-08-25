@@ -5,6 +5,7 @@ import time
 from oandapyV20 import API
 import oandapyV20.endpoints.instruments as instruments
 from types import SimpleNamespace
+import config
 
 # IMPORTANT changed DNS settings can effect this (will stop it working)
 class api_connector():
@@ -20,10 +21,10 @@ class api_connector():
         formatted_date = f"{date_60_days_ago.strftime('%Y')}-{date_60_days_ago.strftime('%m')}-{date_60_days_ago.strftime('%d')}"
 
         dataF = yf.download(
-            "EURUSD=X",
+            config.YF_TICKER,
             start=formatted_date,
             end=nowdate,
-            interval='15m',
+            interval=config.YF_INTERVAL,
         )
         dataF.columns = dataF.columns.get_level_values(0)         
         return dataF
@@ -48,7 +49,7 @@ class api_connector():
     
         params = {
             "count": n,
-            "granularity": "M15",
+            "granularity": interval,
             "price": "B"
         }
     
@@ -62,7 +63,7 @@ class api_connector():
             try:
                 response = client.request(request)
                 break
-            except Exception as e:
+            except Exception:
                 if attempt < 2:
                     print(f"OANDA candle request failed - retrying ({attempt + 1}/2)")
                     time.sleep(5)

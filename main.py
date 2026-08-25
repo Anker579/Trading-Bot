@@ -2,7 +2,9 @@ from data import data_connector, process_data, signal_generators
 from trader import buy_sell
 from oandapyV20 import API
 from dotenv import load_dotenv
+import config
 import os
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -11,8 +13,7 @@ LAST_TRADE_FILE = os.path.join(BASE_DIR, ".last_trade_candle")
 DRY_RUN = os.getenv("DRY_RUN", "true").lower() == "true"
 
 def make_trade():
-    is_live = False
-    #has_prompted = True
+    is_live = config.OANDA_ENVIRONMENT == "live"
 
     my_trader = buy_sell.trade()
 
@@ -26,11 +27,15 @@ def make_trade():
     my_processor = process_data.processor()
     my_sig_gens = signal_generators.sig_gens()
 
-    pair = my_processor.check_pair("EUR_USD")
+    pair = my_processor.check_pair(config.PAIR)
 
-    #my_candles = my_connector.get_candles(is_live, n=201, token=my_auth.auth_deets(is_live, "token", has_prompted), pair=pair, interval=1)
-    my_candles = my_connector.get_candles(is_live, n=205, token=access_token, pair=pair, interval=1)
-
+    my_candles = my_connector.get_candles(
+        is_live,
+        n=config.CANDLE_COUNT,
+        token=access_token,
+        pair=pair,
+        interval=config.TIMEFRAME
+    )
 
     #receives a tuple since the profit/loss calculator needs a candle - uses the one that format columns iterates over last
     format_tuple = my_processor.format_columns(my_candles)
@@ -39,14 +44,18 @@ def make_trade():
 
     candle = format_tuple[1]
 
-    windows = [50,200]
-
-    dfstream = my_processor.add_sma(dfstream, sma_windows=windows)
+    dfstream = my_processor.add_sma(
+        dfstream,
+        sma_windows=config.SMA_WINDOWS
+    )
 
     # Ignore the newest potentially incomplete M15 candle
     completed_df = dfstream.iloc[:-1, :]
 
-    signal = my_sig_gens.sma_sig_gen(completed_df)
+    signal = my_sig_gens.sma_sig_gen(
+        completed_df,
+        config.SMA_WINDOWS,
+        )
 
     # Identify the completed M15 candle that generated this signal
     candle_id = str(int(completed_df["Time"].iloc[-1]))
@@ -78,12 +87,16 @@ def make_trade():
     #access_token = my_auth.auth_deets(is_live, "token", has_prompted)
     client = API(
         access_token=access_token,
-        environment="practice"
+        environment=config.OANDA_ENVIRONMENT
     )
 
     #-----------------------------------------------------------------
     # all this defines stop loss and stop profit     
-    p_l_values = my_trader.p_l_stops(dfstream, 2., candle=candle)
+    p_l_values = my_trader.p_l_stops(
+        dfstream,
+        config.SL_TP_RATIO,
+        candle=candle
+    )
 
     if execution_signal == 0:
         print("No trade to execute")
