@@ -9,11 +9,15 @@ period = config.BACKTEST_PERIOD
 
 sma_windows = config.SMA_WINDOWS
 
-back_data = my_connector.yf_get(
-    period=config.BACKTEST_PERIOD,
-    ticker=config.YF_TICKER,
-    interval=config.YF_INTERVAL
+@st.cache_data(ttl=900)
+def load_backtest_data():
+    return my_connector.yf_get(
+        period=config.BACKTEST_PERIOD,
+        ticker=config.YF_TICKER,
+        interval=config.YF_INTERVAL
     )
+
+back_data = load_backtest_data()
 
 formatted_data, backtest_profit, metrics = run_sma_backtest(
     back_data,

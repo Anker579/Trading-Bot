@@ -1,4 +1,4 @@
-yfinance==0.2.41
+yfinance==1.6.0
 oandapyV20==0.6.3
 pandas>=2.1,<2.3
 time-int==0.0.9
