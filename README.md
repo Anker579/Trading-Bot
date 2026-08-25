@@ -18,6 +18,7 @@ A Python-based algorithmic forex trading project using OANDA for (currently) pra
 - Automated tests with pytest and GitHub Actions
 
 ## Project Structure
+```text
 Trading-Bot/
 ├── data/               # Market data retrieval and signal generation
 ├── trader/             # OANDA trade execution and transaction history
@@ -27,6 +28,7 @@ Trading-Bot/
 ├── config.py           # Trading and strategy configuration
 ├── main.py             # Live trading entry point
 └── app.py              # Streamlit application
+```
 
 ## Installation & Use
 ### Installation
