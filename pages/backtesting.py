@@ -1,11 +1,9 @@
 import streamlit as st
-from data import data_connector, process_data, signal_generators
-from tests.profit_loss import calc_p_l
+from data import data_connector
+from backtest import run_sma_backtest
 import config
 
-my_sig_gens = signal_generators.sig_gens()
 my_connector = data_connector.api_connector()
-my_processor = process_data.processor()
 
 period = config.BACKTEST_PERIOD
 
@@ -13,31 +11,12 @@ sma_windows = config.SMA_WINDOWS
 
 back_data = my_connector.yf_get(period=config.BACKTEST_PERIOD)
 
-back_data = back_data.reset_index()
-
-formatted_data = my_processor.add_sma(back_data, sma_windows)
-
-
-#--------------- adds signal to each transaction candle ------------------
-signal = []
-signal.append(0)
-for i in range(1,len(formatted_data)):
-    df = formatted_data[i-1:i+1]
-    signal.append(my_sig_gens.sma_sig_gen(
-        df,
-        config.SMA_WINDOWS,
-        ))
-
-formatted_data["signal"] = signal
-
-profit = calc_p_l(df=formatted_data)
-
-formatted_data = formatted_data.iloc[max(config.SMA_WINDOWS):]
-
-backtest_profit = profit[1]
+formatted_data, backtest_profit = run_sma_backtest(
+    back_data,
+    config.SMA_WINDOWS
+)
 
 backtest_profit["Cumulative profit"] = backtest_profit["profit"].cumsum()
-
 
 st.title("Backtesting and backtest profit")
 
