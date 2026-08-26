@@ -17,7 +17,12 @@ def load_backtest_data():
         interval=config.YF_INTERVAL
     )
 
-back_data = load_backtest_data()
+try:
+    back_data = load_backtest_data()
+except RuntimeError as e:
+    st.error(str(e))
+    st.info("Yahoo Finance is temporarily unavailable. Please try again later.")
+    st.stop()
 
 formatted_data, backtest_profit, metrics = run_sma_backtest(
     back_data,

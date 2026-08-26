@@ -24,7 +24,15 @@ class api_connector():
             start=formatted_date,
             end=nowdate,
             interval=interval,
+            progress = False,
         )
+
+        if dataF.empty:
+            raise RuntimeError(
+                f"Yahoo Finance returned no data for {ticker}. "
+                "The request may have been rate limited."
+            )
+
         dataF.columns = dataF.columns.get_level_values(0)         
         return dataF
 
