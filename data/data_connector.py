@@ -1,5 +1,4 @@
 import datetime as dt
-import yfinance as yf
 import json
 import time
 from oandapyV20 import API
@@ -10,32 +9,6 @@ from types import SimpleNamespace
 class api_connector():
     def __init__(self) -> None:
         self.period = 60
-    
-    def yf_get(self, period: int, ticker: str, interval: str):
-        x = dt.datetime.now()
-        nowdate = f'{x.strftime("%Y")}-{x.strftime("%m")}-{x.strftime("%d")}'
-
-        date_60_days_ago = x - dt.timedelta(days=(period-1))
-
-        formatted_date = f"{date_60_days_ago.strftime('%Y')}-{date_60_days_ago.strftime('%m')}-{date_60_days_ago.strftime('%d')}"
-
-        dataF = yf.download(
-            ticker,
-            start=formatted_date,
-            end=nowdate,
-            interval=interval,
-            progress = False,
-        )
-
-        if dataF.empty:
-            raise RuntimeError(
-                f"Yahoo Finance returned no data for {ticker}. "
-                "The request may have been rate limited."
-            )
-
-        dataF.columns = dataF.columns.get_level_values(0)         
-        return dataF
-
 
     def get_candles(self, is_live: bool, n: int, token, pair, interval):
         with open('./data/pair_mapping.json', 'r') as f:

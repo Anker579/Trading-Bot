@@ -1,5 +1,6 @@
 import streamlit as st
-from data import data_connector
+import pandas as pd
+from data import data_connector, process_data
 from backtest import run_sma_backtest
 import config
 
@@ -11,17 +12,46 @@ sma_windows = config.SMA_WINDOWS
 
 @st.cache_data(ttl=900)
 def load_backtest_data():
-    return my_connector.yf_get(
-        period=config.BACKTEST_PERIOD,
-        ticker=config.YF_TICKER,
-        interval=config.YF_INTERVAL
+
+    token = st.secrets["OANDA_ACCESS_TOKEN"]
+
+    connector = data_connector.api_connector()
+    processor = process_data.processor()
+
+    candles = connector.get_candles(
+        is_live=config.OANDA_ENVIRONMENT == "live",
+        n=5000,
+        token=token,
+        pair=config.PAIR,
+        interval=config.TIMEFRAME
     )
+
+    data, _ = processor.format_columns(candles)
+
+    # Backtester expects Date or Datetime
+    data = data.rename(columns={"Time": "Datetime"})
+
+    data["Datetime"] = pd.to_datetime(
+        data["Datetime"],
+        unit="s",
+        utc=True
+    )
+
+    # Keep approximately the requested backtest period
+    cutoff = (
+        pd.Timestamp.now(tz="GMT")
+        - pd.Timedelta(days=config.BACKTEST_PERIOD)
+    )
+
+    data = data[data["Datetime"] >= cutoff]
+
+    return data.reset_index(drop=True)
+
 
 try:
     back_data = load_backtest_data()
-except RuntimeError as e:
-    st.error(str(e))
-    st.info("Yahoo Finance is temporarily unavailable. Please try again later.")
+except Exception as e:
+    st.error(f"Failed to retrieve OANDA data: {e}")
     st.stop()
 
 formatted_data, backtest_profit, metrics = run_sma_backtest(
@@ -55,10 +85,15 @@ col4.metric(
     f"{metrics['max_drawdown']:.2f}"
 )
 
-st.write(f"Backtesting is an essential part of trading with set strategies and even more so with algorithmic trading. As such here I have a simple but funtioning backtester which uses the Yahoo Finance api to retrieve the last {config.BACKTEST_PERIOD} days of data for a given forex pair.")
+st.write(f"Backtesting is an essential part of trading with set strategies and even more so with algorithmic trading. As such here I have a simple but funtioning backtester which uses the same Oanda API to retrieve the last {config.BACKTEST_PERIOD} days of data for a given forex pair.")
 st.write("My app achieves this by running the historical data through the buy/sell signal generators for each strategy, once this is done it can use a the stream of signals to calculate how much profit the algorithm/strategy would have made if it was trading live.")
 
+
+
+st.line_chart(data= backtest_profit,y="Cumulative profit", x = "time")
+
 f_data = st.checkbox("Display historical candles")
+
 b_f_data = st.checkbox("Display profit stream for Backtest")
 
 if f_data and b_f_data:
@@ -69,5 +104,3 @@ elif f_data:
     formatted_data
 elif b_f_data:
     backtest_profit
-
-st.line_chart(data= backtest_profit,y="Cumulative profit", x = "time")

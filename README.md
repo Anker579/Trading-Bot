@@ -1,13 +1,13 @@
 # Algo Trading Bot
 
-A Python-based algorithmic forex trading project using OANDA for (currently) practice execution and Yahoo Finance for historical backtesting, this information is then shown on a free streamlit website [here](https://algo-trading-bot-angus.streamlit.app/).
+A Python-based algorithmic forex trading project using OANDA for (currently practice) execution for historical backtesting, this information is then shown on a free streamlit website [here](https://algo-trading-bot-angus.streamlit.app/).
 
 ## Features
 - Simple Moving Average crossover trading strategy
 - OANDA practice/live API integration
 - Automatic stop-loss and take-profit orders
 - Existing-position checks before opening trades
-- Historical backtesting using Yahoo Finance data
+- Historical backtesting using Oanda data
 - Backtest performance metrics:
   - Total profit
   - Number of trades
