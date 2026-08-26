@@ -74,7 +74,15 @@ def make_trade():
 
     # Debug Code
     print("\n--- SIGNAL DEBUG ---")
-    print(completed_df[f"Close", f"sma_{config.SMA_WINDOWS[0]}", f"sma_{config.SMA_WINDOWS[1]}"].tail(3))
+    print(
+        completed_df[
+            [
+                "Close",
+                f"sma_{config.SMA_WINDOWS[0]}",
+                f"sma_{config.SMA_WINDOWS[1]}"
+            ]
+        ].tail(3)
+        )
     print(f"Signal: {signal}")
     print(f"Execution signal: {execution_signal}")
     print(f"Candle ID: {candle_id}")
