@@ -178,14 +178,26 @@ def run_sma_backtest(
 
     formatted_data["signal"] = signals
 
-    if exit_strategy == "opposite_signal":
-        profit_stream = calc_crossover_p_l(formatted_data)
-
+    if exit_strategy == "crossover":
+        profit, profit_stream = calc_p_l(
+            formatted_data
+        )
+    
     elif exit_strategy == "sltp":
-        profit_stream = calc_sltp_p_l(
+        if sl_tp_ratio is None or trade_units is None:
+            raise ValueError(
+                "SL/TP backtest requires sl_tp_ratio and trade_units"
+            )
+    
+        profit, profit_stream = calc_sltp_p_l(
             formatted_data,
-            config.SL_TP_RATIO,
-            config.TRADE_UNITS
+            sl_tp_ratio,
+            trade_units
+        )
+    
+    else:
+        raise ValueError(
+            f"Unknown exit strategy: {exit_strategy}"
         )
 
     formatted_data = formatted_data.iloc[max(sma_windows):]
