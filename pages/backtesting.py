@@ -54,53 +54,136 @@ except Exception as e:
     st.error(f"Failed to retrieve OANDA data: {e}")
     st.stop()
 
-formatted_data, backtest_profit, metrics = run_sma_backtest(
-    back_data,
-    config.SMA_WINDOWS
-)
-
-backtest_profit["Cumulative profit"] = backtest_profit["profit"].cumsum()
-
 st.title("Backtesting and backtest profit")
 
-col1, col2, col3, col4 = st.columns(4)
+st.subheader("Strategies")
 
-col1.metric(
-    "Total Profit",
-    f"{metrics['total_profit']:.2f}"
+use_crossover = st.checkbox(
+    "SMA crossover - exit on opposite crossover",
+    value=True
 )
 
-col2.metric(
-    "Trades",
-    metrics["number_of_trades"]
+use_sltp = st.checkbox(
+    "SMA crossover - stop loss / take profit",
+    value=True
 )
 
-col3.metric(
-    "Win Rate",
-    f"{metrics['win_rate']:.1f}%"
-)
+if not use_crossover and not use_sltp:
+    st.info("Select at least one strategy to run the backtest.")
+    st.stop()
 
-col4.metric(
-    "Max Drawdown",
-    f"{metrics['max_drawdown']:.2f}"
-)
+results = {}
+formatted_data = None
+
+if use_crossover:
+    crossover_data, crossover_profit, crossover_metrics = run_sma_backtest(
+        back_data,
+        config.SMA_WINDOWS,
+        exit_strategy="crossover"
+    )
+
+    crossover_profit["Cumulative profit"] = (
+        crossover_profit["profit"].cumsum()
+    )
+
+    results["SMA Crossover"] = {
+        "profit": crossover_profit,
+        "metrics": crossover_metrics
+    }
+
+    formatted_data = crossover_data
+
+if use_sltp:
+    sltp_data, sltp_profit, sltp_metrics = run_sma_backtest(
+        back_data,
+        config.SMA_WINDOWS,
+        exit_strategy="sltp",
+        sl_tp_ratio=config.SL_TP_RATIO,
+        trade_units=config.TRADE_UNITS
+    )
+
+    sltp_profit["Cumulative profit"] = (
+        sltp_profit["profit"].cumsum()
+    )
+
+    results["SMA + SL/TP"] = {
+        "profit": sltp_profit,
+        "metrics": sltp_metrics
+    }
+
+    if formatted_data is None:
+        formatted_data = sltp_data
+
+for strategy_name, result in results.items():
+    st.subheader(strategy_name)
+
+    metrics = result["metrics"]
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    col1.metric(
+        "Total Profit",
+        f"{metrics['total_profit']:.2f}"
+    )
+
+    col2.metric(
+        "Trades",
+        metrics["number_of_trades"]
+    )
+
+    col3.metric(
+        "Win Rate",
+        f"{metrics['win_rate']:.1f}%"
+    )
+
+    col4.metric(
+        "Max Drawdown",
+        f"{metrics['max_drawdown']:.2f}"
+    )
 
 st.write(f"Backtesting is an essential part of trading with set strategies and even more so with algorithmic trading. As such here I have a simple but funtioning backtester which uses the same Oanda API to retrieve the last {config.BACKTEST_PERIOD} days of data for a given forex pair.")
 st.write("My app achieves this by running the historical data through the buy/sell signal generators for each strategy, once this is done it can use a the stream of signals to calculate how much profit the algorithm/strategy would have made if it was trading live.")
 
 
 
-st.line_chart(data= backtest_profit,y="Cumulative profit", x = "time")
+chart_series = []
+
+for strategy_name, result in results.items():
+    profit_stream = result["profit"]
+
+    if profit_stream.empty:
+        continue
+
+    series = (
+        profit_stream
+        .set_index("time")["Cumulative profit"]
+        .rename(strategy_name)
+    )
+
+    chart_series.append(series)
+
+if chart_series:
+    comparison_chart = pd.concat(
+        chart_series,
+        axis=1
+    ).sort_index()
+
+    comparison_chart = comparison_chart.ffill().fillna(0)
+
+    st.subheader("Cumulative profit comparison")
+    st.line_chart(comparison_chart)
+else:
+    st.info("No completed trades were generated.")
 
 f_data = st.checkbox("Display historical candles")
 
-b_f_data = st.checkbox("Display profit stream for Backtest")
+b_f_data = st.checkbox("Display backtest trades")
 
-if f_data and b_f_data:
-    col1, col2 = st.columns(2)
-    col1.write(formatted_data)
-    col2.write(backtest_profit)
-elif f_data:
-    formatted_data
-elif b_f_data:
-    backtest_profit
+if f_data:
+    st.subheader("Historical candles")
+    st.write(formatted_data)
+
+if b_f_data:
+    for strategy_name, result in results.items():
+        st.subheader(f"{strategy_name} trades")
+        st.write(result["profit"])
