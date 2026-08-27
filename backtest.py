@@ -1,5 +1,6 @@
 from data import process_data, signal_generators
 from tests.profit_loss import calc_p_l
+import pandas as pd
 
 def calculate_metrics(profit_stream):
     if profit_stream.empty:
@@ -23,7 +24,135 @@ def calculate_metrics(profit_stream):
         "max_drawdown": abs(drawdown.min())
     }
 
-def run_sma_backtest(data, sma_windows):
+def calc_sltp_p_l(df, sl_tp_ratio, trade_units):
+    if "Datetime" in df.columns:
+        time_column = "Datetime"
+    elif "Date" in df.columns:
+        time_column = "Date"
+    else:
+        raise ValueError("Data must contain a Date or Datetime column")
+
+    trades = {
+        "time": [],
+        "entry_time": [],
+        "direction": [],
+        "entry_price": [],
+        "exit_price": [],
+        "exit_reason": [],
+        "profit": []
+    }
+
+    i = 0
+
+    while i < len(df) - 1:
+        signal = df["signal"].iloc[i]
+
+        # No entry signal
+        if signal not in (1, 2):
+            i += 1
+            continue
+
+        # Signal occurs after candle i closes,
+        # so enter at the next candle's open.
+        entry_index = i + 1
+
+        entry_price = df["Open"].iloc[entry_index]
+        entry_time = df[time_column].iloc[entry_index]
+
+        candle_range = (
+            df["High"].iloc[i]
+            - df["Low"].iloc[i]
+        )
+
+        if candle_range <= 0:
+            i += 1
+            continue
+
+        if signal == 2:
+            direction = "long"
+
+            stop_loss = entry_price - candle_range
+            take_profit = (
+                entry_price
+                + candle_range * sl_tp_ratio
+            )
+
+        else:
+            direction = "short"
+
+            stop_loss = entry_price + candle_range
+            take_profit = (
+                entry_price
+                - candle_range * sl_tp_ratio
+            )
+
+        exit_found = False
+
+        for j in range(entry_index, len(df)):
+            high = df["High"].iloc[j]
+            low = df["Low"].iloc[j]
+
+            if direction == "long":
+                sl_hit = low <= stop_loss
+                tp_hit = high >= take_profit
+
+            else:
+                sl_hit = high >= stop_loss
+                tp_hit = low <= take_profit
+
+            # If both occur in one candle,
+            # use the conservative assumption that SL occurred first.
+            if sl_hit:
+                exit_price = stop_loss
+                exit_reason = "stop_loss"
+                exit_found = True
+
+            elif tp_hit:
+                exit_price = take_profit
+                exit_reason = "take_profit"
+                exit_found = True
+
+            if exit_found:
+                if direction == "long":
+                    profit = (
+                        exit_price - entry_price
+                    ) * trade_units
+                else:
+                    profit = (
+                        entry_price - exit_price
+                    ) * trade_units
+
+                trades["time"].append(
+                    df[time_column].iloc[j]
+                )
+                trades["entry_time"].append(entry_time)
+                trades["direction"].append(direction)
+                trades["entry_price"].append(entry_price)
+                trades["exit_price"].append(exit_price)
+                trades["exit_reason"].append(exit_reason)
+                trades["profit"].append(profit)
+
+                # Continue searching for new signals
+                # after this trade has closed.
+                i = j
+                break
+
+        if not exit_found:
+            break
+
+        i += 1
+
+    profit_stream = pd.DataFrame(trades)
+
+    return profit_stream["profit"].sum(), profit_stream
+
+def run_sma_backtest(
+    data,
+    sma_windows,
+    exit_strategy="crossover",
+    sl_tp_ratio=None,
+    trade_units=None
+):
     my_processor = process_data.processor()
     my_sig_gens = signal_generators.sig_gens()
 
@@ -49,7 +178,15 @@ def run_sma_backtest(data, sma_windows):
 
     formatted_data["signal"] = signals
 
-    profit, profit_stream = calc_p_l(formatted_data)
+    if exit_strategy == "opposite_signal":
+        profit_stream = calc_crossover_p_l(formatted_data)
+
+    elif exit_strategy == "sltp":
+        profit_stream = calc_sltp_p_l(
+            formatted_data,
+            config.SL_TP_RATIO,
+            config.TRADE_UNITS
+        )
 
     formatted_data = formatted_data.iloc[max(sma_windows):]
 
