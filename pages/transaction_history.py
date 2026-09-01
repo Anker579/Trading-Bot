@@ -14,6 +14,20 @@ accID = st.secrets["OANDA_ACCOUNT_ID"]
 
 response_df = tran_hist.get_history(accID=accID, access_token=access_token)
 
+order_fills = response_df.loc[
+    response_df["type"] == "ORDER_FILL"
+].copy()
+
+order_fills["pl"] = order_fills["pl"].astype(float)
+
+realised_trades = order_fills.loc[
+    order_fills["pl"] != 0
+].copy()
+
+realised_trades["Cumulative_profit"] = (
+    realised_trades["pl"].cumsum()
+)
+
 hist_data = response_df[["time","pl", "type",]].copy()
 
 hist_data.rename(columns={'time': 'Time', 'pl': 'Profit/Loss'}, inplace=True)
@@ -39,9 +53,23 @@ st.write("The algorithm still struggles to maintain a consistent profit but this
 
 show_data = st.checkbox("Show Database")
 if show_data:
-    hist_data
+    st.write(
+        order_fills[
+            [
+                "time",
+                "instrument",
+                "units",
+                "price",
+                "pl",
+                "reason"
+            ]
+        ]
+    )
 
-st.line_chart(data=hist_data, x="Time", y="Cumuluative_profit")
-
+st.line_chart(
+    data=realised_trades,
+    x="time",
+    y="Cumulative_profit"
+)
 if st.button("Click Here to Run the Trading Code (the app may not identify a buy/sell signal so nothing may happen)"):
     make_trade()

@@ -36,32 +36,36 @@ def get_history(accID, access_token):
 
     all_transactions = []
 
-    # While loop to iterate through multiple pages
-    while url:
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"OANDA API error {response.status_code}: "
+            f"{response.text}"
+        )
 
-        # Make the API request
-        response = requests.get(url, headers=headers, params=params)
+    data = response.json()
 
-        # Check if the response is successful
-        if response.status_code == 200:
-            data = response.json()
+    pages = data.get("pages", [])
 
-            # Retrieve the transactions from the current page
-            transactions = data.get('transactions', [])
-            all_transactions.extend(transactions)
+    all_transactions = []
 
-            # Follow pagination if there are more pages
-            pages = data.get('pages', [])
-            url = pages[0] if pages else None  # Get the next page URL
-            params = None  # No need to pass params for the next page requests
-        else:
+    for page_url in pages:
+        page_response = requests.get(
+            page_url,
+            headers=headers
+        )
+
+        if page_response.status_code != 200:
             raise RuntimeError(
-                f"OANDA API error {response.status_code}: {response.text}"
+                f"OANDA API error "
+                f"{page_response.status_code}: "
+                f"{page_response.text}"
             )
-    
-    #print(response)
-    #print(all_transactions)
-    
+
+        page_data = page_response.json()
+
+        all_transactions.extend(
+            page_data.get("transactions", [])
+        )
     
     return pd.DataFrame(all_transactions)
 
