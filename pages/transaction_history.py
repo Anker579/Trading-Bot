@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from trader import tran_hist
 from main import make_trade
 
@@ -19,6 +20,17 @@ order_fills = response_df.loc[
 ].copy()
 
 order_fills["pl"] = order_fills["pl"].astype(float)
+
+order_fills["time"] = (
+    pd.to_datetime(order_fills["time"], utc=True)
+    .dt.tz_convert("Europe/London")
+)
+
+display_data = order_fills.copy()
+
+display_data["time"] = display_data["time"].dt.strftime(
+    "%d/%m/%Y %H:%M"
+)
 
 realised_trades = order_fills.loc[
     order_fills["pl"] != 0
@@ -48,13 +60,13 @@ hist_data["Cumuluative_profit"] = hist_data["Profit/Loss"].cumsum()
 
 st.title("TRANSACTION HISTORY")
 
-st.write("This simply shows every trade made using the oanda account using the trading strategies discussed prior, It is aroung the start of August 2024 that the running algorithm was switched from the Comparator to the Simple Moving Average strategy and the impact on the profit is clear.")
+st.write("This simply shows every trade made using the oanda account using the trading strategies discussed prior, It is around the start of August 2024 that the running algorithm was switched from the Comparator to the Simple Moving Average strategy and the impact on the profit is clear.")
 st.write("The algorithm still struggles to maintain a consistent profit but this is to be expected with such a simplistic model, which does not stand a chance against the multi-million pound models that top Forex trading companies and banks use.")
 
 show_data = st.checkbox("Show Database")
 if show_data:
     st.write(
-        order_fills[
+        display_data[
             [
                 "time",
                 "instrument",
@@ -71,5 +83,6 @@ st.line_chart(
     x="time",
     y="Cumulative_profit"
 )
+
 if st.button("Click Here to Run the Trading Code (the app may not identify a buy/sell signal so nothing may happen)"):
     make_trade()
